@@ -1,0 +1,58 @@
+{
+    "GMs": {
+        "1": {
+            "address": "gm-0.gm-service.default.svc.cluster.local:5011",
+            "assigned_lms": [
+                "lm-0.lm-service.default.svc.cluster.local:5000",
+                "lm-1.lm-service.default.svc.cluster.local:5000"
+            ]
+        },
+        "2": {
+            "address": "gm-1.gm-service.default.svc.cluster.local:5011",
+            "assigned_lms": [
+                "lm-0.lm-service.default.svc.cluster.local:5000",
+                "lm-1.lm-service.default.svc.cluster.local:5000"
+            ]
+        }
+    },
+    "LMs": {
+        "1": {
+            "address": "lm-0.lm-service.default.svc.cluster.local:5000",
+            "partitions": {
+                "1": {
+                    "gm_id": 1,
+                    "worker_nodes": [
+                        "worker-0.worker-service.default.svc.cluster.local:18861",
+                        "worker-1.worker-service.default.svc.cluster.local:18861"
+                    ]
+                },
+                "2": {
+                    "gm_id": 2,
+                    "worker_nodes": [
+                        "worker-2.worker-service.default.svc.cluster.local:18861",
+                        "worker-3.worker-service.default.svc.cluster.local:18861"
+                    ]
+                }
+            }
+        },
+        "2": {
+            "address": "lm-1.lm-service.default.svc.cluster.local:5000",
+            "partitions": {
+                "1": {
+                    "gm_id": 1,
+                    "worker_nodes": [
+                        "worker-4.worker-service.default.svc.cluster.local:18861",
+                        "worker-5.worker-service.default.svc.cluster.local:18861"
+                    ]
+                },
+                "2": {
+                    "gm_id": 2,
+                    "worker_nodes": [
+                        "worker-6.worker-service.default.svc.cluster.local:18861",
+                        "worker-7.worker-service.default.svc.cluster.local:18861"
+                    ]
+                }
+            }
+        }
+    }
+}

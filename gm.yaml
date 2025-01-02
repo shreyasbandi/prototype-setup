@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: gm
+  labels:
+    app: gm
+spec:
+  serviceName: "gm-service"
+  replicas: 2
+  selector:
+    matchLabels:
+      app: gm
+  template:
+    metadata:
+      labels:
+        app: gm
+    spec:
+      containers:
+      - name: gm
+        image: shreyasbandi/gm:latest
+        ports:
+        - containerPort: 5011
+        env:
+        - name: SERVICE_PORT
+          value: "5011"
+        - name: GM_ID
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name # Inject the pod name as the unique identifier
+        - name: GM_REPLICA_INDEX
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name # Get pod name (e.g., lm-0) and parse ordinal in the app
+        resources:
+          requests:
+            cpu: "1" # Request 1 CPU
+            memory: "1Gi" # Optional: Request 1GB memory
+          limits:
+            cpu: "1" # Limit to 1 CPU
+            memory: "1Gi" # Optional: Limit to 1GB memory
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gm-service
+  labels:
+    app: gm
+spec:
+  selector:
+    app: gm
+  ports:
+  - protocol: TCP
+    port: 5011
+    targetPort: 5011
+  clusterIP: None

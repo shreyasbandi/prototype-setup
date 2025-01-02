@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: lm
+  labels:
+    app: lm
+spec:
+  serviceName: "lm-service" # Headless service name
+  replicas: 2
+  selector:
+    matchLabels:
+      app: lm
+  template:
+    metadata:
+      labels:
+        app: lm
+    spec:
+      containers:
+      - name: lm
+        image: shreyasbandi/lm:latest
+        ports:
+        - containerPort: 5000
+        env:
+        - name: SERVICE_PORT
+          value: "5000"
+        - name: LM_ID
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name # Inject the pod name as the unique identifier
+        - name: LM_REPLICA_INDEX
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name # Get pod name (e.g., lm-0) and parse ordinal in the app
+      resources:
+          requests:
+            cpu: "1" # Request 1 CPU
+            memory: "1Gi" # Optional: Request 1GB memory
+          limits:
+            cpu: "1" # Limit to 1 CPU
+            memory: "1Gi" # Optional: Limit to 1GB memory  
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: lm-service
+  labels:
+    app: lm
+spec:
+  selector:
+    app: lm
+  ports:
+  - protocol: TCP
+    port: 5000
+    targetPort: 5000
+  clusterIP: None # Headless service to allow direct pod-to-pod communication

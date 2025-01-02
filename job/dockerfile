@@ -1,0 +1,26 @@
+# Use an official Node.js runtime as the base image
+FROM node:18-alpine
+
+# Set the working directory in the container
+WORKDIR /home
+
+# Copy package.json and package-lock.json to the working directory
+COPY . /home
+
+# Install dependencies
+RUN npm install 
+
+# Copy the rest of the application code to the container
+COPY . .
+
+# Expose the port your application runs on
+EXPOSE 8080
+
+# Set environment variables (can be overridden at runtime)
+ENV GM_SERVICE_NAME="gm-service"
+ENV GM_SERVICE_PORT="5011"
+ENV GM_REPLICAS="2"
+ENV TRACE_FILE="own.tr"
+
+# Command to run the application
+CMD ["node", "job.js"] 

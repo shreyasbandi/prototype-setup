@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: worker # these will be accessed by these name in kubernets cluster and pods will
+                        # be generated using these name
+spec:
+  serviceName: "worker-service"
+  replicas: 8
+  selector:
+    matchLabels:
+      app: worker
+  template:
+    metadata:
+      labels:
+        app: worker
+    spec:
+      containers:
+      - name: worker
+        image: shreyasbandi/worker:latest
+        ports:
+        - containerPort: 18861
+        env:
+        - name: SERVICE_PORT
+          value: "18861"
+      resources:
+          requests:
+            cpu: "1" # Request 1 CPU
+            memory: "1Gi" # Optional: Request 1GB memory
+          limits:
+            cpu: "1" # Limit to 1 CPU
+            memory: "1Gi" # Optional: Limit to 1GB memory
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: worker-service # within the kubernets i can acess this by these name these will be used in dns
+spec:
+  selector:
+    app: worker # target only those pods whose label is this
+  ports:
+    - protocol: TCP
+      port: 18861
+      targetPort: 18861
+  clusterIP: None  # Headless service to give each pod its own DNS entry

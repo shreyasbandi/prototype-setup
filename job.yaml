@@ -1,0 +1,91 @@
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: job-classifier
+#   labels:
+#     app: job-classifier
+# spec:
+#   replicas: 1
+#   selector:
+#     matchLabels:
+#       app: job-classifier
+#   template:
+#     metadata:
+#       labels:
+#         app: job-classifier
+#     spec:
+#       containers:
+#       - name: job-classifier
+#         image: shreyasbandi/job-classifier:latest # Replace with your image
+#         env:
+#         - name: GM_SERVICE_NAME
+#           value: "gm-service"
+#         - name: GM_SERVICE_PORT
+#           value: "5011"
+#         - name: GM_REPLICAS
+#           value: "2"
+        
+#         ports:
+#         - containerPort: 8080 # Replace with your application's listening port
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: job-classifier-service
+#   labels:
+#     app: job-classifier
+# spec:
+#   selector:
+#     app: job-classifier
+#   ports:
+#   - protocol: TCP
+#     port: 8080
+#     targetPort: 8080
+
+
+# Job to run the job-classifier container
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: job-classifier
+spec:
+  completions: 1 # Run the job only once
+  backoffLimit: 0 # Do not retry if it fails
+  template:
+    metadata:
+      labels:
+        app: job-classifier # Label to link with the Service
+    spec:
+      containers:
+      - name: job-classifier
+        image: shreyasbandi/job-classifier:latest # Replace with your image
+        env:
+        - name: TRACE_FILE
+          value: "own.tr" # Trace file path
+        - name: GM_SERVICE_NAME
+          value: "gm-service" # GM service name
+        - name: GM_SERVICE_PORT
+          value: "5011" # GM service port
+        - name: GM_REPLICAS
+          value: "2" # Number of GM replicas
+        ports:
+        - containerPort: 8080 # Internal container port
+
+      restartPolicy: Never # Ensure no restart of the container
+---
+# Service to expose the Job's container
+apiVersion: v1
+kind: Service
+metadata:
+  name: job-classifier-service
+  labels:
+    app: job-classifier
+spec:
+  selector:
+    app: job-classifier # Select the pods with this label
+  ports:
+  - protocol: TCP
+    port: 80 # External-facing port for the Service
+    targetPort: 8080 # Internal container port
+  type: ClusterIP # Default service type for internal communication
+
